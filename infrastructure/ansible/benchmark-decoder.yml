@@ -1,0 +1,110 @@
+- name: Benchmark Setup
+  hosts: benchmark_server
+  vars:
+    repo_dir: TODO
+    build_dir: "{{ repo_dir }}/decoder/build"
+  tasks:
+    - name: Copy over ssh deploy private key
+      ansible.builtin.copy:
+        src: ./id_ed25519
+        dest: ~/.ssh/id_ed25519
+        owner: ubuntu
+        group: ubuntu
+        mode: "0600"
+    - name: Copy over ssh deploy public key
+      ansible.builtin.copy:
+        src: ./id_ed25519.pub
+        dest: ~/.ssh/id_ed25519.pub
+        owner: ubuntu
+        group: ubuntu
+        mode: "0644"
+
+    - name: Pull repo
+      git:
+        repo: TODO
+        dest: "{{ repo_dir }}"
+        version: benchmarks-6
+        accept_hostkey: yes
+
+    - name: Create build directory
+      file:
+        path: "{{ build_dir }}"
+        state: directory
+        mode: "0755"
+
+    - name: Run CMake
+      command:
+        chdir: "{{ build_dir }}"
+        cmd: "cmake .."
+        creates: "{{ build_dir }}/Makefile"
+      register: cmake_result
+
+    - name: Run make
+      command:
+        chdir: "{{ build_dir }}"
+        cmd: make
+      register: make_result
+      when: cmake_result.changed
+
+    - name: Upload instance
+      ansible.builtin.copy:
+        src: ./instance.json
+        dest: "{{ build_dir }}/instance.json"
+        owner: ubuntu
+        group: ubuntu
+        mode: "0644"
+
+    - name: Upload config
+      ansible.builtin.copy:
+        src: ./config.json
+        dest: "{{ build_dir }}/config.json"
+        owner: ubuntu
+        group: ubuntu
+        mode: "0644"
+
+    - name: Upload run script
+      ansible.builtin.copy:
+        src: ./run.sh
+        dest: "{{ build_dir }}/run.sh"
+        owner: ubuntu
+        group: ubuntu
+        mode: "0770"
+
+    - name: Upload finish script
+      ansible.builtin.copy:
+        src: ./finish.sh
+        dest: /home/ubuntu/finish.sh
+        mode: "0770"
+        owner: ubuntu
+        group: ubuntu
+
+    - name: Upload cleanup script
+      ansible.builtin.copy:
+        src: ./cleanup.sh
+        dest: /home/ubuntu/cleanup.sh
+        mode: "0770"
+        owner: ubuntu
+        group: ubuntu
+
+    - name: Copy service unit file
+      ansible.builtin.copy:
+        src: ./run_benchmark.service
+        dest: /etc/systemd/system/run_benchmark.service
+        mode: "0644"
+      notify:
+        - Reload systemd
+      become: yes
+
+    - name: Start the service
+      systemd:
+        name: run_benchmark.service
+        state: started
+      become: yes
+      async: 1
+      poll: 0
+
+  handlers:
+    - name: Reload systemd
+      systemd:
+        daemon_reload: true
+      become: yes

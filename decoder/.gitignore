@@ -1,0 +1,12 @@
+*.bak
+ch_decoder
+compile_flags.txt
+.DS_Store
+CMakeFiles/
+CMakeCache.txt
+Makefile
+cmake_install.cmake
+example_instances/
+.vscode/
+configs/
+.cache/

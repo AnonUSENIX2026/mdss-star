@@ -1,0 +1,4 @@
+*.sage.py
+*.json
+__pycache__/
+*.py

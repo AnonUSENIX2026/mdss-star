@@ -1,0 +1,9 @@
+Checks: '-*,bugprone-*,cert-dcl21-cpp,cert-dcl50-cpp,cert-env33-c,cert-err34-c,cert-err52-cpp,cert-err60-cpp,cert-flp30-c,cert-msc50-cpp,cert-msc51-cpp,cppcoreguidelines-*,-cppcoreguidelines-avoid-do-while,-bugprone-easily-swappable-parameters,-cppcoreguidelines-avoid-magic-numbers'
+CheckOptions:
+    - key: bugprone-argument-comment.StrictMode
+      value: 1
+    - key: bugprone-exception-escape.FunctionsThatShouldNotThrow
+      value: WinMain,SDL_main
+    - key: misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic
+      value: 1
+FormatStyle: 'file'

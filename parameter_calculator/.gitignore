@@ -1,0 +1,6 @@
+*.py
+*.sage.py
+*.pickle
+*.json
+__pycache__/
+old/

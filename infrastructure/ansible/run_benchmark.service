@@ -1,0 +1,13 @@
+[Unit]
+Description=Run benchmark script, then upload results and terminate server
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash -c 'TODO ADD PATH HERE/decoder/build/run.sh'
+ExecStartPost=/home/ubuntu/finish.sh
+ExecStopPost=/home/ubuntu/cleanup.sh
+RemainAfterExit=true
+
+[Install]
+WantedBy=multi-user.target
